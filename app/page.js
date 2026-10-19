@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Heart, Plus, Search } from "lucide-react";
+import { Heart, Plus, Search, Dices, ArrowRight } from "lucide-react";
 import { useBooks } from "@/lib/useBooks";
 import { STATUSES, GENRES } from "@/lib/constants";
 import BookCard from "@/components/BookCard";
@@ -95,6 +95,26 @@ export default function Home() {
         <StatTile label="Olvasásra vár" value={stats.want} tone="teal" />
         <StatTile label="Elolvasott oldal" value={stats.pagesRead.toLocaleString("hu-HU")} tone="sand" />
       </section>
+
+      {stats.want > 0 && (
+        <Link
+          href="/next"
+          className="card group flex items-center gap-4 px-5 py-4 transition hover:border-accent"
+        >
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-surface-2 text-accent">
+            <Dices size={22} />
+          </span>
+          <span className="flex-1">
+            <span className="block font-display text-lg">
+              Mi legyen a <em className="text-accent">következő?</em>
+            </span>
+            <span className="text-xs text-muted">
+              Sorsolj egyet a {stats.want} olvasásra váró könyved közül – akár műfaj szerint.
+            </span>
+          </span>
+          <ArrowRight size={18} className="text-muted transition group-hover:translate-x-1 group-hover:text-accent" />
+        </Link>
+      )}
 
       {reading.length > 0 && (
         <section>

@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Library, Plus, BookOpen } from "lucide-react";
+import { Library, Plus, BookOpen, Heart, Dices } from "lucide-react";
 
 // Később ide jön: Áttekintés (dashboard), Naptár, Napló, Könyvtár
 const links = [
   { href: "/", label: "Könyveim", icon: Library },
+  { href: "/favorites", label: "Kedvencek", icon: Heart },
+  { href: "/next", label: "Mi legyen a következő?", short: "Következő", icon: Dices },
   { href: "/add", label: "Új könyv", icon: Plus },
 ];
 
@@ -49,16 +51,16 @@ export default function Sidebar() {
 
       {/* Mobil nézet: alsó menüsor */}
       <nav className="fixed inset-x-0 bottom-0 z-20 flex justify-around border-t border-line bg-surface/95 px-2 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur md:hidden">
-        {links.map(({ href, label, icon: Icon }) => {
+        {links.map(({ href, label, short, icon: Icon }) => {
           const active = isActive(pathname, href);
           return (
             <Link
               key={href}
               href={href}
-              className={`flex flex-col items-center gap-1 px-4 py-1 text-xs ${active ? "text-accent" : "text-muted"}`}
+              className={`flex flex-col items-center gap-1 px-2 py-1 text-xs ${active ? "text-accent" : "text-muted"}`}
             >
               <Icon size={20} />
-              {label}
+              {short ?? label}
             </Link>
           );
         })}

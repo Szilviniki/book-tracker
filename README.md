@@ -31,6 +31,7 @@ Az adatok a `data/konyvespolc.db` fájlban vannak (első indításkor jön létr
 ## Tervek
 
 - [x] Teljes design átalakítás
+- [x] Kedvencek oldal és „Mi legyen a következő?” véletlen választó
 - [ ] Naptárnézet és olvasási napló
 - [ ] Dashboard átalakítás
 - [ ] AI-os könyvértékelő oldal
