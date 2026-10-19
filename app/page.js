@@ -142,10 +142,9 @@ async function Dashboard({ searchParams }) {
         <StatRow label="Olvasásra vár" value={t.want} color="var(--spine-2)" />
         <StatRow label="Most olvasom" value={t.reading} color="var(--spine-4)" />
         <StatRow label="Elolvasott oldal" value={t.pagesRead.toLocaleString("hu-HU")} color="var(--spine-7)" />
-        <div className="grid grid-cols-2 gap-3 sm:col-span-2 xl:col-span-1 xl:grid-cols-1">
+        <div className="grid grid-cols-1 gap-3 sm:col-span-2 sm:grid-cols-3 xl:col-span-1 xl:grid-cols-1">
           <Highlight label="Top műfaj" value={h.genre?.label} detail={h.genre && `${h.genre.count} könyv`} />
           <Highlight label="Top szerző" value={h.author?.label} detail={h.author && `${h.author.count} könyv`} />
-          <Highlight label="Top formátum" value={h.format?.label} detail={h.format && `${h.format.count} könyv`} />
           <Highlight
             label="Leghosszabb könyv"
             value={h.longest?.label}

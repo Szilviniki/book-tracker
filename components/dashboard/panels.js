@@ -42,14 +42,15 @@ export function ReadingProgress({ book }) {
   );
 }
 
-// Színes statisztika-sor (felirat balra, szám jobbra)
+// Színes statisztika-sor (felirat balra, szám jobbra). 50%-os színezés: elég élénk,
+// de a világos szöveg még jól olvasható rajta (kontraszt > 4.5:1 minden színnél).
 export function StatRow({ label, value, color }) {
   return (
     <div
       className="flex items-center justify-between gap-3 rounded-lg px-4 py-3"
-      style={{ backgroundColor: `color-mix(in oklab, ${color} 30%, var(--surface))` }}
+      style={{ backgroundColor: `color-mix(in oklab, ${color} 50%, var(--surface))` }}
     >
-      <span className="text-[0.7rem] font-semibold tracking-[0.12em] text-muted uppercase">{label}</span>
+      <span className="text-[0.7rem] font-semibold tracking-[0.12em] text-fg uppercase">{label}</span>
       <span className="font-display text-2xl tabular-nums lining-nums">{value}</span>
     </div>
   );
