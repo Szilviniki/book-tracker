@@ -20,8 +20,8 @@ export async function generateMetadata({ params }) {
 export default function BookPage({ params }) {
   return (
     <div className="flex flex-col gap-8">
-      <Link href="/" className="flex w-fit items-center gap-1.5 text-sm text-muted hover:text-fg">
-        <ArrowLeft size={16} /> Könyveim
+      <Link href="/library" className="flex w-fit items-center gap-1.5 text-sm text-muted hover:text-fg">
+        <ArrowLeft size={16} /> Könyvtár
       </Link>
       <Suspense fallback={<Spinner />}>
         <BookDetail params={params} />

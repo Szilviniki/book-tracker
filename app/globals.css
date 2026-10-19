@@ -29,6 +29,18 @@
   --spine-6: #8a7f76;
   --spine-7: #b8a07a;
   --spine-8: #8d7d9a;
+
+  /* grafikonok – a sötét háttérre validált paletta (színvakság-biztos sorrendben) */
+  --chart-1: #cd7769; /* rózsa */
+  --chart-2: #0b79a0; /* petróleumkék */
+  --chart-3: #b18c39; /* mustár */
+  --chart-4: #3c834f; /* zöld */
+  --chart-5: #9d6aa9; /* mályva */
+  --chart-other: #5f5852; /* "Egyéb" */
+  /* státuszok és havi bontás: befejezett = rózsa, olvasott/kezdett = kék, váró = mustár */
+  --status-finished: var(--chart-1);
+  --status-reading: var(--chart-2);
+  --status-want: var(--chart-3);
 }
 
 @theme inline {

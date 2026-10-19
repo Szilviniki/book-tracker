@@ -6,7 +6,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 function isActive(pathname, href) {
-  if (href === "/") return pathname === "/" || pathname.startsWith("/books");
+  if (href === "/") return pathname === "/";
+  // egy könyv oldala a könyvtárhoz tartozik
+  if (href === "/library") return pathname.startsWith("/library") || pathname.startsWith("/books");
   return pathname.startsWith(href);
 }
 

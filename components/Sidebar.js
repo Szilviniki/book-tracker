@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { Library, Plus, BookOpen, Heart, Dices } from "lucide-react";
+import { LayoutDashboard, Library, Plus, BookOpen, Heart, Dices } from "lucide-react";
 import NavLink from "./NavLink";
 
-// Később ide jön: Áttekintés (dashboard), Naptár, Napló, Könyvtár
+// Később ide jön: Naptár, Napló, digitális könyvtár
 const links = [
-  { href: "/", label: "Könyveim", icon: Library },
+  { href: "/", label: "Áttekintés", icon: LayoutDashboard },
+  { href: "/library", label: "Könyvtár", icon: Library },
   { href: "/favorites", label: "Kedvencek", icon: Heart },
   { href: "/next", label: "Mi legyen a következő?", short: "Következő", icon: Dices },
   { href: "/add", label: "Új könyv", icon: Plus },

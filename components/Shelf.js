@@ -14,7 +14,7 @@ export default function Shelf({ books }) {
 
   return (
     <div className="relative">
-      <div className="flex items-end gap-1 overflow-x-auto px-2 pt-2">
+      <div className="flex items-end gap-1 overflow-x-auto px-2 pt-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {books.map((book) => {
           const height = 120 + Math.round(((book.title.length * 7) % 5) * 6); // kis változatosság
           const width = spineWidth(book.totalPages);

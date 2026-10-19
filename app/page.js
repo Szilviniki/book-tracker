@@ -1,38 +1,38 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import Form from "next/form";
-import { Heart, Plus, Search, Dices, ArrowRight } from "lucide-react";
+import { Plus, Dices, ArrowRight } from "lucide-react";
 import { listBooks } from "@/lib/server/books";
 import { fillSpineColorsLater } from "@/lib/server/spineColors";
-import { STATUSES, GENRES } from "@/lib/constants";
+import { GENRES, FORMATS } from "@/lib/constants";
 import { hrefWith, param } from "@/lib/url";
-import BookCard from "@/components/BookCard";
-import BookCover from "@/components/BookCover";
-import ProgressBar, { progressPercent } from "@/components/ProgressBar";
+import { totals, highlights, monthlySummary, yearsWithData, genreBreakdown, statusBreakdown } from "@/lib/stats";
 import Shelf from "@/components/Shelf";
 import Greeting from "@/components/Greeting";
-import { StatTile, ChipLink, Spinner, buttonClass } from "@/components/ui";
+import { MonthlyBars, GenreDonut, StatusBar } from "@/components/dashboard/charts";
+import { Panel, CoverRow, ReadingProgress, StatRow, Highlight } from "@/components/dashboard/panels";
+import { ChipLink, Spinner, buttonClass } from "@/components/ui";
 
-export default function Home({ searchParams }) {
+export default function DashboardPage({ searchParams }) {
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-8">
       <Greeting>
         <Link href="/add" className={buttonClass()}>
           <Plus size={16} /> Új könyv
         </Link>
       </Greeting>
       <Suspense fallback={<Spinner />}>
-        <HomeContent searchParams={searchParams} />
+        <Dashboard searchParams={searchParams} />
       </Suspense>
     </div>
   );
 }
 
-async function HomeContent({ searchParams }) {
+// A dashboard szűrői is az URL-ben vannak:
+//   year – a havi összesítő éve, fg – kedvencek műfaja, ng / nf – következő olvasmány műfaja / formátuma
+async function Dashboard({ searchParams }) {
   const sp = await searchParams;
   const books = await listBooks();
-  // A borítóból számolt gerincszínek pótlása a háttérben (pl. régebben felvett könyveknél)
-  fillSpineColorsLater();
+  fillSpineColorsLater(); // hiányzó gerincszínek pótlása a háttérben
 
   if (books.length === 0) {
     return (
@@ -48,7 +48,14 @@ async function HomeContent({ searchParams }) {
     );
   }
 
-  const year = new Date().getFullYear();
+  const currentYear = new Date().getFullYear();
+  const years = yearsWithData(books, currentYear);
+  const year = years.includes(Number(param(sp.year))) ? Number(param(sp.year)) : currentYear;
+  const filters = { year: year === currentYear ? "" : year, fg: param(sp.fg) ?? "", ng: param(sp.ng) ?? "", nf: param(sp.nf) ?? "" };
+  const href = (changes) => hrefWith("/", filters, changes);
+
+  const t = totals(books);
+  const h = highlights(books);
   const reading = books.filter((b) => b.status === "reading");
   const shelfBooks = [
     ...reading,
@@ -57,161 +64,123 @@ async function HomeContent({ searchParams }) {
     ...books.filter((b) => b.status === "want" && !b.favorite),
   ].slice(0, 30);
 
-  const stats = {
-    finishedThisYear: books.filter((b) => b.status === "finished" && b.finishedAt?.startsWith(String(year))).length,
-    reading: reading.length,
-    want: books.filter((b) => b.status === "want").length,
-    pagesRead: books.reduce((sum, b) => sum + (b.currentPage || 0), 0),
-  };
+  const favorites = books.filter((b) => b.favorite);
+  const favoriteGenres = GENRES.filter((g) => favorites.some((b) => b.genre === g.key));
+  const shownFavorites = favorites.filter((b) => !filters.fg || b.genre === filters.fg).slice(0, 5);
+
+  const want = books.filter((b) => b.status === "want");
+  const wantGenres = GENRES.filter((g) => want.some((b) => b.genre === g.key));
+  const wantFormats = Object.entries(FORMATS).filter(([key]) => want.some((b) => b.format === key));
+  const nextUp = want.filter((b) => (!filters.ng || b.genre === filters.ng) && (!filters.nf || b.format === filters.nf));
 
   return (
-    <>
-      <Shelf books={shelfBooks} />
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,1fr)_13rem_20rem]">
+      {/* Bal oszlop: polc, most olvasom, kedvencek, következő olvasmány */}
+      <div className="flex min-w-0 flex-col gap-6">
+        <Shelf books={shelfBooks} />
 
-      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <StatTile label={`Elolvasva ${year}-ben`} value={stats.finishedThisYear} tone="accent" />
-        <StatTile label="Most olvasom" value={stats.reading} tone="sage" />
-        <StatTile label="Olvasásra vár" value={stats.want} tone="teal" />
-        <StatTile label="Elolvasott oldal" value={stats.pagesRead.toLocaleString("hu-HU")} tone="sand" />
-      </section>
+        <Panel title="Most olvasom">
+          <CoverRow books={reading} caption={(book) => <ReadingProgress book={book} />} empty="Épp nem olvasol semmit." />
+        </Panel>
 
-      {stats.want > 0 && (
-        <Link href="/next" className="card group flex items-center gap-4 px-5 py-4 transition hover:border-accent">
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-surface-2 text-accent">
-            <Dices size={22} />
-          </span>
-          <span className="flex-1">
-            <span className="block font-display text-lg">
-              Mi legyen a <em className="text-accent">következő?</em>
-            </span>
-            <span className="text-xs text-muted">
-              Sorsolj egyet a {stats.want} olvasásra váró könyved közül – akár műfaj szerint.
-            </span>
-          </span>
-          <ArrowRight size={18} className="text-muted transition group-hover:translate-x-1 group-hover:text-accent" />
-        </Link>
-      )}
-
-      {reading.length > 0 && <ReadingNow books={reading} />}
-
-      <Library books={books} filters={{ status: param(sp.status), genre: param(sp.genre), fav: param(sp.fav), q: param(sp.q) }} />
-    </>
-  );
-}
-
-function ReadingNow({ books }) {
-  return (
-    <section>
-      <h2 className="eyebrow mb-4">Most olvasom</h2>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {books.map((book) => (
-          <Link
-            key={book.id}
-            href={`/books/${book.id}`}
-            className="card group flex gap-4 p-4 transition hover:border-line-strong"
-          >
-            <div className="w-16 shrink-0">
-              <BookCover book={book} />
+        <Panel title="Kedvenc könyveim" action={<Link href="/favorites" className="text-xs text-muted hover:text-accent">Mind →</Link>}>
+          {favoriteGenres.length > 1 && (
+            <div className="mb-4 flex flex-wrap gap-1.5">
+              <ChipLink size="sm" href={href({ fg: "" })} active={!filters.fg}>Mind</ChipLink>
+              {favoriteGenres.map((g) => (
+                <ChipLink key={g.key} size="sm" href={href({ fg: g.key })} active={filters.fg === g.key}>
+                  {g.label}
+                </ChipLink>
+              ))}
             </div>
-            <div className="flex min-w-0 flex-1 flex-col">
-              <p className="line-clamp-2 font-display leading-snug group-hover:text-accent">{book.title}</p>
-              <p className="line-clamp-1 text-xs text-muted">{book.authors.join(", ")}</p>
-              <div className="mt-auto flex items-center gap-2 pt-3">
-                <ProgressBar book={book} />
-                <span className="text-xs text-muted tabular-nums lining-nums">{progressPercent(book)}%</span>
-              </div>
-              {book.totalPages && (
-                <p className="mt-1 text-[0.7rem] text-faint tabular-nums lining-nums">
-                  {book.currentPage} / {book.totalPages} oldal
-                </p>
+          )}
+          <CoverRow books={shownFavorites} empty="Még nincs kedvenced – egy könyv oldalán jelölheted meg." />
+        </Panel>
+
+        <Panel
+          title="Következő olvasmány"
+          action={
+            nextUp.length > 0 && (
+              <Link href={hrefWith("/next", {}, { genre: filters.ng })} className="flex items-center gap-1.5 text-xs text-muted hover:text-accent">
+                <Dices size={14} /> Sorsolj ezek közül <ArrowRight size={12} />
+              </Link>
+            )
+          }
+        >
+          {(wantGenres.length > 0 || wantFormats.length > 1) && (
+            <div className="mb-4 flex flex-col gap-2">
+              {wantGenres.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  <ChipLink size="sm" href={href({ ng: "" })} active={!filters.ng}>Minden műfaj</ChipLink>
+                  {wantGenres.map((g) => (
+                    <ChipLink key={g.key} size="sm" href={href({ ng: g.key })} active={filters.ng === g.key}>
+                      {g.label}
+                    </ChipLink>
+                  ))}
+                </div>
+              )}
+              {wantFormats.length > 1 && (
+                <div className="flex flex-wrap gap-1.5">
+                  <ChipLink size="sm" href={href({ nf: "" })} active={!filters.nf}>Bármilyen formátum</ChipLink>
+                  {wantFormats.map(([key, label]) => (
+                    <ChipLink key={key} size="sm" href={href({ nf: key })} active={filters.nf === key}>
+                      {label}
+                    </ChipLink>
+                  ))}
+                </div>
               )}
             </div>
-          </Link>
-        ))}
+          )}
+          <CoverRow books={nextUp.slice(0, 5)} empty="Nincs ilyen olvasásra váró könyved." />
+        </Panel>
       </div>
-    </section>
-  );
-}
 
-// A könyvtár szűrői az URL-ben vannak (?status=…&genre=…&fav=1&q=…),
-// így linkekkel és egy sima keresőűrlappal működnek, kliens kód nélkül.
-function Library({ books, filters }) {
-  const { status = "", genre = "", fav = "", q = "" } = filters;
-  const href = (changes) => hrefWith("/", filters, changes);
-
-  const usedGenres = GENRES.filter((g) => books.some((b) => b.genre === g.key));
-  const query = q.trim().toLowerCase();
-  const visible = books.filter(
-    (b) =>
-      (!status || b.status === status) &&
-      (!genre || b.genre === genre) &&
-      (!fav || b.favorite) &&
-      (!query || b.title.toLowerCase().includes(query) || b.authors.some((a) => a.toLowerCase().includes(query)))
-  );
-  const count = (key) => books.filter((b) => b.status === key).length;
-
-  return (
-    <section id="konyvtar" className="flex flex-col gap-5">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <h2 className="font-display text-2xl">
-          A <em className="text-accent">könyvtáram</em>
-        </h2>
-        <div className="flex flex-wrap items-center gap-2">
-          <Form action="/" scroll={false} replace className="relative">
-            {status && <input type="hidden" name="status" value={status} />}
-            {genre && <input type="hidden" name="genre" value={genre} />}
-            {fav && <input type="hidden" name="fav" value={fav} />}
-            <Search size={15} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-faint" />
-            <input
-              type="search"
-              name="q"
-              defaultValue={q}
-              placeholder="Cím vagy szerző…"
-              aria-label="Keresés a könyvtárban"
-              className="field w-52 rounded-full! py-1.5 pl-9 text-sm"
-            />
-          </Form>
-          <ChipLink href={href({ fav: fav ? "" : "1" })} active={Boolean(fav)}>
-            <span className="flex items-center gap-1.5">
-              <Heart size={14} className={fav ? "fill-accent-ink" : ""} /> Kedvencek
-            </span>
-          </ChipLink>
+      {/* Középső oszlop: számok és kiemelések */}
+      <div className="grid content-start gap-3 sm:grid-cols-2 xl:grid-cols-1">
+        <StatRow label="Összes könyv" value={t.all} color="var(--spine-1)" />
+        <StatRow label="Elolvasva" value={t.finished} color="var(--spine-3)" />
+        <StatRow label="Olvasásra vár" value={t.want} color="var(--spine-2)" />
+        <StatRow label="Most olvasom" value={t.reading} color="var(--spine-4)" />
+        <StatRow label="Elolvasott oldal" value={t.pagesRead.toLocaleString("hu-HU")} color="var(--spine-7)" />
+        <div className="grid grid-cols-2 gap-3 sm:col-span-2 xl:col-span-1 xl:grid-cols-1">
+          <Highlight label="Top műfaj" value={h.genre?.label} detail={h.genre && `${h.genre.count} könyv`} />
+          <Highlight label="Top szerző" value={h.author?.label} detail={h.author && `${h.author.count} könyv`} />
+          <Highlight label="Top formátum" value={h.format?.label} detail={h.format && `${h.format.count} könyv`} />
+          <Highlight
+            label="Leghosszabb könyv"
+            value={h.longest?.label}
+            detail={h.longest && `${h.longest.count} oldal`}
+            href={h.longest && `/books/${h.longest.id}`}
+          />
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-1.5">
-        <ChipLink href={href({ status: "" })} active={!status}>
-          Mind · {books.length}
-        </ChipLink>
-        {Object.entries(STATUSES).map(([key, label]) => (
-          <ChipLink key={key} href={href({ status: key })} active={status === key}>
-            {label} · {count(key)}
-          </ChipLink>
-        ))}
+      {/* Jobb oszlop: grafikonok */}
+      <div className="grid content-start gap-6 md:grid-cols-2 xl:grid-cols-1">
+        <Panel
+          title={`Éves összesítő · ${year}`}
+          className="md:row-span-2 xl:row-span-1"
+          action={
+            years.length > 1 && (
+              <div className="flex gap-1">
+                {years.slice(0, 4).map((y) => (
+                  <ChipLink key={y} size="sm" href={href({ year: y === currentYear ? "" : y })} active={y === year}>
+                    {y}
+                  </ChipLink>
+                ))}
+              </div>
+            )
+          }
+        >
+          <MonthlyBars months={monthlySummary(books, year)} year={year} />
+        </Panel>
+        <Panel title="Műfajok szerint">
+          <GenreDonut slices={genreBreakdown(books)} />
+        </Panel>
+        <Panel title="Státusz szerint">
+          <StatusBar parts={statusBreakdown(books)} />
+        </Panel>
       </div>
-
-      {usedGenres.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          <ChipLink size="sm" href={href({ genre: "" })} active={!genre}>
-            Minden műfaj
-          </ChipLink>
-          {usedGenres.map((g) => (
-            <ChipLink key={g.key} size="sm" href={href({ genre: g.key })} active={genre === g.key}>
-              {g.label}
-            </ChipLink>
-          ))}
-        </div>
-      )}
-
-      {visible.length === 0 ? (
-        <p className="py-12 text-center text-muted">Nincs találat ezekkel a szűrőkkel.</p>
-      ) : (
-        <div className="grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
-          {visible.map((book) => (
-            <BookCard key={book.id} book={book} />
-          ))}
-        </div>
-      )}
-    </section>
+    </div>
   );
 }

@@ -78,5 +78,5 @@ export async function startReading(id) {
 
 export async function deleteBookAction(id) {
   deleteBook(id);
-  redirect("/");
+  redirect("/library");
 }
