@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
+  // Docker image-hez: .next/standalone csak a futáshoz szükséges fájlokkal
+  output: "standalone",
+  // az adatbázis a futáskor csatolt volume-ban él, ne kerüljön az image-be
+  outputFileTracingExcludes: { "/*": ["data/**"] },
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {
