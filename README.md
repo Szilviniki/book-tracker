@@ -3,7 +3,9 @@
 Könyvkövető alkalmazás: mit olvasok, hol tartok benne, mit gondolok róla.
 Később reading journal és digitális könyvtár is lesz belőle.
 
-**Technológia:** Next.js 16 (App Router), JavaScript, Tailwind CSS, SQLite (Node beépített `node:sqlite`).
+**Technológia:** Next.js 16 (App Router), JavaScript, Tailwind CSS, SQLite (Node beépített `node:sqlite`), lucide-react ikonok.
+
+**Design:** sötét, meleg alap poros pasztell színekkel. A színek tokenként az `app/globals.css` elején vannak, a közös elemek a `components/ui.js`-ben.
 
 ## Indítás
 
@@ -28,7 +30,7 @@ Az adatok a `data/konyvespolc.db` fájlban vannak (első indításkor jön létr
 
 ## Tervek
 
-- [ ] Teljes design átalakítás
+- [x] Teljes design átalakítás
 - [ ] Naptárnézet és olvasási napló
 - [ ] Dashboard átalakítás
 - [ ] AI-os könyvértékelő oldal

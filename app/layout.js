@@ -1,6 +1,6 @@
 import { Suspense } from "react";
-import { Geist, Literata } from "next/font/google";
-import Nav from "@/components/Nav";
+import { Geist, Playfair_Display } from "next/font/google";
+import Sidebar from "@/components/Sidebar";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -8,9 +8,10 @@ const geistSans = Geist({
   subsets: ["latin", "latin-ext"],
 });
 
-const literata = Literata({
-  variable: "--font-serif",
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
   subsets: ["latin", "latin-ext"],
+  style: ["normal", "italic"],
 });
 
 export const metadata = {
@@ -20,12 +21,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="hu" className={`${geistSans.variable} ${literata.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col font-sans">
+    <html lang="hu" className={`${geistSans.variable} ${playfair.variable} h-full antialiased`}>
+      <body className="min-h-full font-sans md:flex">
         <Suspense>
-          <Nav />
+          <Sidebar />
         </Suspense>
-        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">{children}</main>
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-6 pb-28 sm:px-8 md:pt-10 md:pb-12">{children}</main>
       </body>
     </html>
   );

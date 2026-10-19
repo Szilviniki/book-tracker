@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Search, Plus } from "lucide-react";
 import { searchBooks } from "@/lib/openLibrary";
-import { addBook, STATUSES } from "@/lib/storage";
+import { addBook } from "@/lib/storage";
+import { STATUSES, FORMATS, GENRES, GENRE_LABELS } from "@/lib/constants";
 import BookCover from "@/components/BookCover";
+import { PageHeader, Segmented, Section, Button } from "@/components/ui";
 
 export default function AddBookPage() {
   const router = useRouter();
@@ -13,6 +16,7 @@ export default function AddBookPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [status, setStatus] = useState("want");
+  const [format, setFormat] = useState("physical");
   const [saving, setSaving] = useState(false);
 
   // Keresés gépelés közben, kis késleltetéssel (debounce)
@@ -45,7 +49,7 @@ export default function AddBookPage() {
     setSaving(true);
     setError(null);
     try {
-      const book = await addBook({ ...data, status });
+      const book = await addBook({ ...data, status, format });
       router.push(`/books/${book.id}`);
     } catch (e) {
       setError(`Nem sikerült menteni: ${e.message}`);
@@ -65,79 +69,87 @@ export default function AddBookPage() {
         .filter(Boolean),
       totalPages: Number(form.get("totalPages")) || null,
       coverUrl: form.get("coverUrl").trim() || null,
+      genre: form.get("genre") || null,
     });
   }
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-10">
-      <div>
-        <h1 className="font-serif text-3xl font-semibold">Új könyv</h1>
-        <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
-          <span className="text-muted">Hova kerüljön?</span>
-          {Object.entries(STATUSES).map(([key, label]) => (
-            <button
-              key={key}
-              onClick={() => setStatus(key)}
-              className={`rounded-full border px-3 py-1 transition ${
-                status === key ? "border-accent bg-accent text-white" : "border-border hover:bg-accent-soft"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+      <PageHeader eyebrow="Könyveim" title="Új" accent="könyv" />
+
+      <div className="grid gap-6 sm:grid-cols-2">
+        <Section title="Hova kerüljön?">
+          <Segmented size="sm" options={STATUSES} value={status} onChange={setStatus} />
+        </Section>
+        <Section title="Formátum">
+          <Segmented size="sm" options={FORMATS} value={format} onChange={setFormat} />
+        </Section>
       </div>
 
       <section className="flex flex-col gap-4">
-        <input
-          autoFocus
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Keress cím, szerző vagy ISBN alapján…"
-          className="w-full rounded-xl border border-border bg-card px-5 py-3 outline-none focus:border-accent"
-        />
+        <label className="relative">
+          <Search size={18} className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-faint" />
+          <input
+            autoFocus
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Keress cím, szerző vagy ISBN alapján…"
+            className="field w-full rounded-xl! py-3.5 pl-11 text-base"
+          />
+        </label>
         {loading && <p className="text-sm text-muted">Keresés…</p>}
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm text-danger">{error}</p>}
         {shown.length > 0 && (
-          <ul className="flex flex-col divide-y divide-border rounded-xl border border-border bg-card">
+          <ul className="card flex flex-col divide-y divide-line overflow-hidden">
             {shown.map((r) => (
-              <li key={r.source.key} className="flex items-center gap-4 p-3">
+              <li key={r.source.key} className="flex items-center gap-4 p-3 transition hover:bg-surface-2">
                 <div className="w-12 shrink-0">
                   <BookCover book={r} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-serif font-medium">{r.title}</p>
+                  <p className="truncate font-display">{r.title}</p>
                   <p className="truncate text-sm text-muted">
                     {[r.authors.join(", "), r.year, r.totalPages && `${r.totalPages} oldal`].filter(Boolean).join(" · ")}
                   </p>
+                  {r.genre && (
+                    <span className="mt-1 inline-block rounded-full bg-surface-2 px-2 py-0.5 text-[0.7rem] text-sage">
+                      {GENRE_LABELS[r.genre]}
+                    </span>
+                  )}
                 </div>
-                <button
-                  onClick={() => add(r)}
-                  disabled={saving}
-                  className="shrink-0 rounded-full bg-accent px-4 py-1.5 text-sm text-white hover:opacity-90 disabled:opacity-50"
-                >
-                  Hozzáad
-                </button>
+                <Button onClick={() => add(r)} disabled={saving} className="shrink-0 px-4! py-1.5!">
+                  <Plus size={15} /> Hozzáad
+                </Button>
               </li>
             ))}
           </ul>
         )}
       </section>
 
-      <section>
-        <h2 className="font-serif text-xl font-semibold">Vagy add meg kézzel</h2>
-        <form onSubmit={addManual} className="mt-4 grid gap-4 sm:grid-cols-2">
+      <section className="card p-6">
+        <h2 className="font-display text-xl">
+          Vagy add meg <em className="text-accent">kézzel</em>
+        </h2>
+        <form onSubmit={addManual} className="mt-5 grid gap-4 sm:grid-cols-2">
           <Field label="Cím *" name="title" required className="sm:col-span-2" />
           <Field label="Szerző(k), vesszővel elválasztva" name="authors" />
           <Field label="Oldalszám" name="totalPages" type="number" min="1" />
-          <Field label="Borítókép URL (opcionális)" name="coverUrl" type="url" className="sm:col-span-2" />
-          <button
-            disabled={saving}
-            className="rounded-full bg-foreground px-6 py-2.5 text-background hover:opacity-90 disabled:opacity-50 sm:col-span-2 sm:justify-self-start"
-          >
+          <label className="flex flex-col gap-1.5 text-sm">
+            <span className="text-muted">Műfaj</span>
+            <select name="genre" defaultValue="" className="field">
+              <option value="">Nincs megadva</option>
+              {GENRES.map((g) => (
+                <option key={g.key} value={g.key}>
+                  {g.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <Field label="Borítókép URL (opcionális)" name="coverUrl" type="url" />
+          <Button disabled={saving} className="sm:col-span-2 sm:justify-self-start">
             Mentés
-          </button>
+          </Button>
         </form>
       </section>
     </div>
@@ -146,12 +158,9 @@ export default function AddBookPage() {
 
 function Field({ label, className = "", ...props }) {
   return (
-    <label className={`flex flex-col gap-1 text-sm ${className}`}>
+    <label className={`flex flex-col gap-1.5 text-sm ${className}`}>
       <span className="text-muted">{label}</span>
-      <input
-        {...props}
-        className="rounded-lg border border-border bg-card px-3 py-2 text-base outline-none focus:border-accent"
-      />
+      <input {...props} className="field text-base" />
     </label>
   );
 }
