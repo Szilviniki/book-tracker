@@ -47,7 +47,7 @@ export function StatRow({ label, value, color }) {
   return (
     <div
       className="flex items-center justify-between gap-3 rounded-lg px-4 py-3"
-      style={{ backgroundColor: `color-mix(in oklab, ${color} 22%, var(--surface))` }}
+      style={{ backgroundColor: `color-mix(in oklab, ${color} 30%, var(--surface))` }}
     >
       <span className="text-[0.7rem] font-semibold tracking-[0.12em] text-muted uppercase">{label}</span>
       <span className="font-display text-2xl tabular-nums lining-nums">{value}</span>

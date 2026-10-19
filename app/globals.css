@@ -13,29 +13,29 @@
   --muted: #a39788;
   --faint: #6f665e;
 
-  --accent: #d99a8e; /* púderrózsa – fő kiemelés */
+  --accent: #e99181; /* korall-rózsa – fő kiemelés */
   --accent-ink: #2a1714; /* szöveg az accent színen */
-  --sage: #9cb8ae;
-  --teal: #9fbcc0;
-  --sand: #d4bc94;
+  --sage: #7fc0ab;
+  --teal: #7ec3cc;
+  --sand: #dcba81;
   --danger: #e08080;
 
   /* könyvgerincek és grafikonok színei */
-  --spine-1: #b98474;
-  --spine-2: #7f9c93;
-  --spine-3: #d99a8e;
-  --spine-4: #6e8f94;
-  --spine-5: #c9a29a;
-  --spine-6: #8a7f76;
-  --spine-7: #b8a07a;
-  --spine-8: #8d7d9a;
+  --spine-1: #c77d67;
+  --spine-2: #5ea491;
+  --spine-3: #e99181;
+  --spine-4: #4196a2;
+  --spine-5: #d39d92;
+  --spine-6: #947c68;
+  --spine-7: #c09e67;
+  --spine-8: #907aa2;
 
   /* grafikonok – a sötét háttérre validált paletta (színvakság-biztos sorrendben) */
-  --chart-1: #cd7769; /* rózsa */
-  --chart-2: #0b79a0; /* petróleumkék */
-  --chart-3: #b18c39; /* mustár */
-  --chart-4: #3c834f; /* zöld */
-  --chart-5: #9d6aa9; /* mályva */
+  --chart-1: #dd6b5b; /* rózsa */
+  --chart-2: #007bb2; /* petróleumkék */
+  --chart-3: #bb8d0c; /* mustár */
+  --chart-4: #048149; /* zöld */
+  --chart-5: #ac66bc; /* mályva */
   --chart-other: #5f5852; /* "Egyéb" */
   /* státuszok és havi bontás: befejezett = rózsa, olvasott/kezdett = kék, váró = mustár */
   --status-finished: var(--chart-1);
