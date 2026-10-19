@@ -8,7 +8,8 @@ RUN npm run build
 
 FROM node:24-slim
 WORKDIR /app
-ENV NODE_ENV=production PORT=3000 HOSTNAME=0.0.0.0
+# AUTH_TRUST_HOST: a Coolify proxy mögött az Auth.js a kérés hostját használja a visszahívási URL-hez
+ENV NODE_ENV=production PORT=3000 HOSTNAME=0.0.0.0 AUTH_TRUST_HOST=true
 COPY --from=build --chown=node:node /app/.next/standalone ./
 COPY --from=build --chown=node:node /app/.next/static ./.next/static
 COPY --from=build --chown=node:node /app/public ./public

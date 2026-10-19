@@ -46,7 +46,7 @@ function readFields(formData) {
 export async function createBookAction(_prevState, formData) {
   let book;
   try {
-    book = createBook(readFields(formData));
+    book = await createBook(readFields(formData));
   } catch (e) {
     // A beküldött értékeket is visszaadjuk, hogy az űrlap ne ürüljön ki
     if (e instanceof ValidationError) return { error: e.message, values: Object.fromEntries(formData) };
@@ -61,7 +61,7 @@ export async function createBookAction(_prevState, formData) {
 export async function addFoundBook(formData) {
   const data = readFields(formData);
   if (data.source?.type === "openlibrary") data.description = await fetchDescription(data.source.key);
-  const book = createBook(data);
+  const book = await createBook(data);
   fillSpineColorsLater();
   redirect(`/books/${book.id}`);
 }
@@ -74,21 +74,21 @@ export async function updateBookAction(id, formData) {
   if (changes.totalPages && changes.currentPage >= changes.totalPages) changes.status = "finished";
   if (changes.totalPages && changes.currentPage > changes.totalPages) changes.currentPage = changes.totalPages;
 
-  updateBook(id, changes);
+  await updateBook(id, changes);
   refresh();
 }
 
 export async function toggleFavorite(id, favorite) {
-  updateBook(id, { favorite });
+  await updateBook(id, { favorite });
   refresh();
 }
 
 export async function startReading(id) {
-  updateBook(id, { status: "reading" });
+  await updateBook(id, { status: "reading" });
   redirect(`/books/${id}`);
 }
 
 export async function deleteBookAction(id) {
-  deleteBook(id);
+  await deleteBook(id);
   redirect("/library");
 }

@@ -1,6 +1,8 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { LayoutDashboard, Library, BookOpen, Heart, Dices } from "lucide-react";
 import NavLink from "./NavLink";
+import UserMenu from "./UserMenu";
 
 // Később ide jön: Naptár, Napló, digitális könyvtár
 const links = [
@@ -34,6 +36,9 @@ export default function Sidebar() {
             </NavLink>
           ))}
         </nav>
+        <Suspense>
+          <UserMenu />
+        </Suspense>
       </aside>
 
       {/* Mobil nézet: alsó menüsor */}
@@ -49,6 +54,9 @@ export default function Sidebar() {
             {short ?? label}
           </NavLink>
         ))}
+        <Suspense>
+          <UserMenu mobile />
+        </Suspense>
       </nav>
     </>
   );
