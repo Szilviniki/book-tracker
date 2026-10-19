@@ -3,6 +3,7 @@ import Link from "next/link";
 import Form from "next/form";
 import { Heart, Plus, Search, Dices, ArrowRight } from "lucide-react";
 import { listBooks } from "@/lib/server/books";
+import { fillSpineColorsLater } from "@/lib/server/spineColors";
 import { STATUSES, GENRES } from "@/lib/constants";
 import { hrefWith, param } from "@/lib/url";
 import BookCard from "@/components/BookCard";
@@ -30,6 +31,8 @@ export default function Home({ searchParams }) {
 async function HomeContent({ searchParams }) {
   const sp = await searchParams;
   const books = await listBooks();
+  // A borítóból számolt gerincszínek pótlása a háttérben (pl. régebben felvett könyveknél)
+  fillSpineColorsLater();
 
   if (books.length === 0) {
     return (

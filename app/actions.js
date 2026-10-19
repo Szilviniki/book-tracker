@@ -7,6 +7,7 @@
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { createBook, updateBook, deleteBook, ValidationError } from "@/lib/server/books";
+import { fillSpineColorsLater } from "@/lib/server/spineColors";
 
 // FormData -> könyvmezők. Csak azokat a mezőket vesszük át, amik az űrlapon szerepeltek.
 function readFields(formData) {
@@ -42,12 +43,14 @@ export async function createBookAction(_prevState, formData) {
     if (e instanceof ValidationError) return { error: e.message, values: Object.fromEntries(formData) };
     throw e;
   }
+  fillSpineColorsLater();
   redirect(`/books/${book.id}`);
 }
 
 // Új könyv az Open Library találatokból (rejtett mezőkkel érkezik)
 export async function addFoundBook(formData) {
   const book = createBook(readFields(formData));
+  fillSpineColorsLater();
   redirect(`/books/${book.id}`);
 }
 
