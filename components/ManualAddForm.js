@@ -8,7 +8,7 @@ import { createBookAction } from "@/app/actions";
 import { GENRES } from "@/lib/constants";
 import SubmitButton from "./SubmitButton";
 
-export default function ManualAddForm({ status, format }) {
+export default function ManualAddForm({ status, format, seriesNames = [] }) {
   const [state, formAction] = useActionState(createBookAction, null);
   const values = state?.values ?? {};
 
@@ -31,6 +31,13 @@ export default function ManualAddForm({ status, format }) {
         </select>
       </label>
       <Field label="Borítókép URL (opcionális)" name="coverUrl" type="url" defaultValue={values.coverUrl} />
+      <Field label="Sorozat (opcionális)" name="seriesName" list="series-names" defaultValue={values.seriesName} />
+      <datalist id="series-names">
+        {seriesNames.map((name) => (
+          <option key={name} value={name} />
+        ))}
+      </datalist>
+      <Field label="Hányadik kötet" name="seriesIndex" type="number" min="0" step="0.5" defaultValue={values.seriesIndex} />
       {state?.error && <p className="text-sm text-danger sm:col-span-2">{state.error}</p>}
       <SubmitButton className="sm:col-span-2 sm:justify-self-start">Mentés</SubmitButton>
     </form>

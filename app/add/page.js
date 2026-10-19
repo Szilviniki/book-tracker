@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import Form from "next/form";
 import { Search, Plus } from "lucide-react";
 import { searchBooks } from "@/lib/openLibrary";
+import { listSeriesNames } from "@/lib/server/books";
 import { addFoundBook } from "@/app/actions";
 import { STATUSES, FORMATS, GENRE_LABELS } from "@/lib/constants";
 import { hrefWith, param } from "@/lib/url";
@@ -87,7 +88,7 @@ async function AddBook({ searchParams }) {
         <h2 className="font-display text-xl">
           Vagy add meg <em className="text-accent">kézzel</em>
         </h2>
-        <ManualAddForm status={status} format={format} />
+        <ManualAddForm status={status} format={format} seriesNames={await listSeriesNames()} />
       </section>
     </>
   );

@@ -25,24 +25,34 @@ export default function LibraryPage({ searchParams }) {
   );
 }
 
-// A szűrők az URL-ben vannak (?status=…&genre=…&fav=1&q=…),
+// A szűrők az URL-ben vannak (?status=…&genre=…&series=…&fav=1&q=…),
 // így linkekkel és egy sima keresőűrlappal működnek, kliens kód nélkül.
 async function Library({ searchParams }) {
   const sp = await searchParams;
-  const filters = { status: param(sp.status) ?? "", genre: param(sp.genre) ?? "", fav: param(sp.fav) ?? "", q: param(sp.q) ?? "" };
-  const { status, genre, fav, q } = filters;
+  const filters = {
+    status: param(sp.status) ?? "",
+    genre: param(sp.genre) ?? "",
+    series: param(sp.series) ?? "",
+    fav: param(sp.fav) ?? "",
+    q: param(sp.q) ?? "",
+  };
+  const { status, genre, series, fav, q } = filters;
   const href = (changes) => hrefWith("/library", filters, changes);
   const books = await listBooks();
 
   const usedGenres = GENRES.filter((g) => books.some((b) => b.genre === g.key));
+  const seriesNames = [...new Set(books.map((b) => b.seriesName).filter(Boolean))].sort((a, b) => a.localeCompare(b, "hu"));
   const query = q.trim().toLowerCase();
   const visible = books.filter(
     (b) =>
       (!status || b.status === status) &&
       (!genre || b.genre === genre) &&
+      (!series || b.seriesName === series) &&
       (!fav || b.favorite) &&
       (!query || b.title.toLowerCase().includes(query) || b.authors.some((a) => a.toLowerCase().includes(query)))
   );
+  // Sorozatra szűrve kötetszám szerint rendezünk
+  if (series) visible.sort((a, b) => (a.seriesIndex ?? Infinity) - (b.seriesIndex ?? Infinity));
   const count = (key) => books.filter((b) => b.status === key).length;
 
   return (
@@ -51,6 +61,7 @@ async function Library({ searchParams }) {
         <Form action="/library" scroll={false} replace className="relative">
           {status && <input type="hidden" name="status" value={status} />}
           {genre && <input type="hidden" name="genre" value={genre} />}
+          {series && <input type="hidden" name="series" value={series} />}
           {fav && <input type="hidden" name="fav" value={fav} />}
           <Search size={15} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-faint" />
           <input
@@ -88,6 +99,20 @@ async function Library({ searchParams }) {
           {usedGenres.map((g) => (
             <ChipLink key={g.key} size="sm" href={href({ genre: g.key })} active={genre === g.key}>
               {g.label}
+            </ChipLink>
+          ))}
+        </div>
+      )}
+
+      {seriesNames.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="eyebrow mr-1">Sorozat</span>
+          <ChipLink size="sm" href={href({ series: "" })} active={!series}>
+            Mind
+          </ChipLink>
+          {seriesNames.map((name) => (
+            <ChipLink key={name} size="sm" href={href({ series: name })} active={series === name}>
+              {name}
             </ChipLink>
           ))}
         </div>

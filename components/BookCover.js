@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 // Sima <img>-et használunk, mert a borítók bármilyen külső címről jöhetnek.
-import { spineColor, spineTextColor } from "@/lib/bookColor";
+import { bookColors } from "@/lib/bookColor";
 
 export default function BookCover({ book, className = "" }) {
   if (book.coverUrl) {
@@ -13,10 +13,11 @@ export default function BookCover({ book, className = "" }) {
       />
     );
   }
-  // Borító nélkül: a könyv saját színével, a címmel
+  // Borító nélkül: a könyv palettaszínével, a címmel
+  const { background, text } = bookColors(book);
   return (
     <div
-      style={{ backgroundColor: spineColor(book), color: spineTextColor(book) }}
+      style={{ backgroundColor: background, color: text }}
       className={`flex aspect-[2/3] w-full flex-col justify-between rounded-md p-3 shadow-lg shadow-black/40 ${className}`}
     >
       <span className="line-clamp-4 font-display text-sm leading-tight">{book.title}</span>

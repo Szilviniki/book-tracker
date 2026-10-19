@@ -1,8 +1,9 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Heart } from "lucide-react";
-import { getBook } from "@/lib/server/books";
+import { ArrowLeft, Heart, Library } from "lucide-react";
+import { getBook, listSeriesNames } from "@/lib/server/books";
+import { hrefWith } from "@/lib/url";
 import { updateBookAction, toggleFavorite } from "@/app/actions";
 import { STATUSES, FORMATS, GENRES } from "@/lib/constants";
 import BookCover from "@/components/BookCover";
@@ -34,6 +35,7 @@ async function BookDetail({ params }) {
   const { id } = await params;
   const book = await getBook(id);
   if (!book) notFound();
+  const seriesNames = await listSeriesNames();
 
   // Minden űrlap ugyanazt a Server Actiont hívja, a könyv azonosítójával "előre kitöltve"
   const update = updateBookAction.bind(null, book.id);
@@ -59,6 +61,16 @@ async function BookDetail({ params }) {
         <header>
           <h1 className="font-display text-3xl leading-tight sm:text-4xl">{book.title}</h1>
           {book.authors.length > 0 && <p className="mt-2 text-lg text-muted">{book.authors.join(", ")}</p>}
+          {book.seriesName && (
+            <Link
+              href={hrefWith("/library", {}, { series: book.seriesName })}
+              className="mt-3 inline-flex items-center gap-2 rounded-full border border-line px-3 py-1 text-sm text-muted transition hover:border-accent hover:text-accent"
+            >
+              <Library size={14} />
+              {book.seriesName}
+              {book.seriesIndex != null && <span className="text-faint">· {book.seriesIndex}. kötet</span>}
+            </Link>
+          )}
         </header>
 
         <Section title="Státusz">
@@ -136,6 +148,31 @@ async function BookDetail({ params }) {
                   </option>
                 ))}
               </select>
+            </Field>
+            <Field label="Sorozat">
+              <input
+                name="seriesName"
+                list="series-names"
+                defaultValue={book.seriesName ?? ""}
+                placeholder="pl. Harry Potter"
+                className="field w-full"
+              />
+              <datalist id="series-names">
+                {seriesNames.map((name) => (
+                  <option key={name} value={name} />
+                ))}
+              </datalist>
+            </Field>
+            <Field label="Hányadik kötet">
+              <input
+                type="number"
+                name="seriesIndex"
+                min="0"
+                step="0.5"
+                defaultValue={book.seriesIndex ?? ""}
+                placeholder="pl. 2"
+                className="field w-full"
+              />
             </Field>
             <Field label="Elkezdtem">
               <input type="date" name="startedAt" defaultValue={book.startedAt ?? ""} className="field w-full" />

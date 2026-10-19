@@ -3,6 +3,7 @@ import { Heart } from "lucide-react";
 import BookCover from "./BookCover";
 import ProgressBar, { progressPercent } from "./ProgressBar";
 import { Stars } from "./StarRating";
+import { seriesLabel } from "@/lib/bookColor";
 
 export default function BookCard({ book }) {
   return (
@@ -18,6 +19,7 @@ export default function BookCard({ book }) {
       <div className="flex flex-col gap-1">
         <h3 className="line-clamp-2 font-display leading-snug group-hover:text-accent">{book.title}</h3>
         {book.authors.length > 0 && <p className="line-clamp-1 text-xs text-muted">{book.authors.join(", ")}</p>}
+        {book.seriesName && <p className="line-clamp-1 text-xs text-faint italic">{seriesLabel(book)}</p>}
       </div>
       {book.status === "reading" && (
         <div className="flex items-center gap-2">

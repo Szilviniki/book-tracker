@@ -14,11 +14,11 @@ function readFields(formData) {
   const data = {};
   const text = (name) => (formData.has(name) ? String(formData.get(name)).trim() : undefined);
 
-  for (const name of ["title", "status", "format", "genre", "coverUrl", "startedAt", "finishedAt", "notes"]) {
+  for (const name of ["title", "status", "format", "genre", "coverUrl", "startedAt", "finishedAt", "notes", "seriesName"]) {
     const value = text(name);
     if (value !== undefined) data[name] = value;
   }
-  for (const name of ["totalPages", "currentPage", "rating"]) {
+  for (const name of ["totalPages", "currentPage", "rating", "seriesIndex"]) {
     const value = text(name);
     if (value !== undefined) data[name] = value === "" ? null : Number(value);
   }
