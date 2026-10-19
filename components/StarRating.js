@@ -1,27 +1,26 @@
-"use client";
-
 import { Star } from "lucide-react";
 
-export default function StarRating({ value, onChange, size = 24 }) {
+// Értékelő csillagok űrlapként: minden csillag egy küldőgomb (name="rating").
+// A már kiválasztott csillagra kattintva töröljük az értékelést.
+export default function StarRating({ value, action }) {
   return (
-    <div className="flex gap-1" role="radiogroup" aria-label="Értékelés">
+    <form action={action} className="flex gap-1" aria-label="Értékelés">
       {[1, 2, 3, 4, 5].map((n) => {
         const on = value && n <= value;
         return (
           <button
             key={n}
-            type="button"
-            role="radio"
-            aria-checked={value === n}
+            name="rating"
+            value={value === n ? "" : n}
             aria-label={`${n} csillag`}
-            onClick={() => onChange(value === n ? null : n)}
+            aria-pressed={value === n}
             className="transition hover:scale-110"
           >
-            <Star size={size} className={on ? "fill-sand text-sand" : "text-line-strong"} />
+            <Star size={24} className={on ? "fill-sand text-sand" : "text-line-strong"} />
           </button>
         );
       })}
-    </div>
+    </form>
   );
 }
 

@@ -1,8 +1,6 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { Library, Plus, BookOpen, Heart, Dices } from "lucide-react";
+import NavLink from "./NavLink";
 
 // Később ide jön: Áttekintés (dashboard), Naptár, Napló, Könyvtár
 const links = [
@@ -12,14 +10,7 @@ const links = [
   { href: "/add", label: "Új könyv", icon: Plus },
 ];
 
-function isActive(pathname, href) {
-  if (href === "/") return pathname === "/" || pathname.startsWith("/books");
-  return pathname.startsWith(href);
-}
-
 export default function Sidebar() {
-  const pathname = usePathname();
-
   return (
     <>
       {/* Asztali nézet: oldalsáv */}
@@ -31,39 +22,33 @@ export default function Sidebar() {
           <span className="font-display text-xl">Könyvespolc</span>
         </Link>
         <nav className="flex flex-col gap-1">
-          {links.map(({ href, label, icon: Icon }) => {
-            const active = isActive(pathname, href);
-            return (
-              <Link
-                key={href}
-                href={href}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
-                  active ? "bg-surface-2 text-fg" : "text-muted hover:bg-surface-2/60 hover:text-fg"
-                }`}
-              >
-                <Icon size={18} className={active ? "text-accent" : ""} />
-                {label}
-              </Link>
-            );
-          })}
+          {links.map(({ href, label, icon: Icon }) => (
+            <NavLink
+              key={href}
+              href={href}
+              className="group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted transition hover:bg-surface-2/60 hover:text-fg"
+              activeClassName="bg-surface-2 text-fg! [&>svg]:text-accent"
+            >
+              <Icon size={18} />
+              {label}
+            </NavLink>
+          ))}
         </nav>
       </aside>
 
       {/* Mobil nézet: alsó menüsor */}
       <nav className="fixed inset-x-0 bottom-0 z-20 flex justify-around border-t border-line bg-surface/95 px-2 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur md:hidden">
-        {links.map(({ href, label, short, icon: Icon }) => {
-          const active = isActive(pathname, href);
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={`flex flex-col items-center gap-1 px-2 py-1 text-xs ${active ? "text-accent" : "text-muted"}`}
-            >
-              <Icon size={20} />
-              {short ?? label}
-            </Link>
-          );
-        })}
+        {links.map(({ href, label, short, icon: Icon }) => (
+          <NavLink
+            key={href}
+            href={href}
+            className="flex flex-col items-center gap-1 px-2 py-1 text-xs text-muted"
+            activeClassName="text-accent!"
+          >
+            <Icon size={20} />
+            {short ?? label}
+          </NavLink>
+        ))}
       </nav>
     </>
   );

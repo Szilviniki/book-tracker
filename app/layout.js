@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { Geist, Playfair_Display } from "next/font/google";
 import Sidebar from "@/components/Sidebar";
 import "./globals.css";
@@ -15,7 +14,10 @@ const playfair = Playfair_Display({
 });
 
 export const metadata = {
-  title: "Könyvespolc",
+  title: {
+    template: "%s · Könyvespolc",
+    default: "Könyvespolc",
+  },
   description: "Olvasásaim nyomon követése",
 };
 
@@ -23,9 +25,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="hu" className={`${geistSans.variable} ${playfair.variable} h-full antialiased`}>
       <body className="min-h-full font-sans md:flex">
-        <Suspense>
-          <Sidebar />
-        </Suspense>
+        <Sidebar />
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-6 pb-28 sm:px-8 md:pt-10 md:pb-12">{children}</main>
       </body>
     </html>

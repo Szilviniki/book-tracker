@@ -1,4 +1,6 @@
-// Kisebb, sokfelé használt felületi elemek egy helyen.
+// Kisebb, sokfelé használt felületi elemek. Mind szerveroldali komponens
+// (nincs bennük böngészős JavaScript), így bárhol használhatók.
+import Link from "next/link";
 
 export function PageHeader({ eyebrow, title, accent, children }) {
   return (
@@ -24,27 +26,27 @@ export function StatTile({ label, value, tone = "accent" }) {
   );
 }
 
-// Egymást kizáró gombok (pl. státusz, formátum)
-export function Segmented({ options, value, onChange, size = "md" }) {
+function chipClass(active, size) {
   const pad = size === "sm" ? "px-3 py-1 text-xs" : "px-4 py-1.5 text-sm";
+  return `inline-block rounded-full border transition ${pad} ${
+    active
+      ? "border-accent bg-accent text-accent-ink"
+      : "border-line text-muted hover:border-line-strong hover:text-fg"
+  }`;
+}
+
+// Választó "chip" linkként – szűrőkhöz (az állapot az URL-ben van)
+export function ChipLink({ href, active, size, children }) {
   return (
-    <div className="flex flex-wrap gap-1.5">
-      {Object.entries(options).map(([key, label]) => (
-        <button
-          key={key}
-          type="button"
-          onClick={() => onChange(key)}
-          className={`rounded-full border transition ${pad} ${
-            value === key
-              ? "border-accent bg-accent text-accent-ink"
-              : "border-line text-muted hover:border-line-strong hover:text-fg"
-          }`}
-        >
-          {label}
-        </button>
-      ))}
-    </div>
+    <Link href={href} scroll={false} replace aria-current={active ? "true" : undefined} className={chipClass(active, size)}>
+      {children}
+    </Link>
   );
+}
+
+// Választó "chip" küldőgombként – űrlapon belül (name/value-t küld)
+export function ChipButton({ active, size, ...props }) {
+  return <button {...props} aria-pressed={active} className={chipClass(active, size)} />;
 }
 
 const BUTTON_VARIANTS = {
@@ -68,5 +70,14 @@ export function Section({ title, children, className = "" }) {
       <h2 className="eyebrow mb-3">{title}</h2>
       {children}
     </section>
+  );
+}
+
+// Betöltés jelző a <Suspense fallback={...}>-hez
+export function Spinner() {
+  return (
+    <div className="flex justify-center py-24">
+      <span className="size-6 animate-spin rounded-full border-2 border-line border-t-accent" aria-label="Betöltés" />
+    </div>
   );
 }

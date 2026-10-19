@@ -20,13 +20,20 @@ Az adatok a `data/konyvespolc.db` fájlban vannak (első indításkor jön létr
 
 ## Felépítés
 
-| Mappa | Tartalom |
+Az app a Next.js App Router ajánlott működését követi:
+
+- **Server Components** – az oldalak a szerveren készülnek, közvetlenül az adatbázisból olvasnak.
+- **Server Actions** – minden mentés sima `<form>`-ból, szerveroldali függvénnyel történik (JavaScript nélkül is működik).
+- **Szűrők az URL-ben** – pl. `/?status=reading&genre=fantasy`, így linkelhetők és visszaléptethetők.
+- **Kliens komponens csak ahol kell** – aktív menüpont, mentés-jelző gomb, törlés-megerősítés, helyi idő szerinti köszöntés, a véletlen választó animációja, a kézi felvétel hibaüzenete.
+
+| Hely | Tartalom |
 | --- | --- |
-| `app/` | Oldalak és API végpontok (`app/api/books`) |
-| `components/` | Újrahasználható felületi elemek |
-| `lib/storage.js`, `lib/useBooks.js` | Kliensoldali adatréteg (az API-t hívja) |
-| `lib/server/` | Adatbázis és szerveroldali logika – sémaváltozás: `MIGRATIONS` a `db.js`-ben |
-| `lib/openLibrary.js` | Könyvkeresés az Open Library API-val |
+| `app/` | Oldalak (`page.js`), `actions.js` (Server Actions), `error.js`, `not-found.js` |
+| `components/` | Felületi elemek; a `"use client"` jelölésűek futnak a böngészőben |
+| `lib/server/` | Adatbázis és lekérdezések (csak szerveren) – sémaváltozás: `MIGRATIONS` a `db.js`-ben |
+| `lib/openLibrary.js` | Könyvkeresés az Open Library API-val (szerveren, 1 órás gyorsítótárral) |
+| `lib/constants.js` | Státuszok, formátumok, műfajok |
 
 ## Tervek
 
