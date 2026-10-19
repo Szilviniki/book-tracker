@@ -15,11 +15,7 @@ import { ChipLink, Spinner, buttonClass } from "@/components/ui";
 export default function DashboardPage({ searchParams }) {
   return (
     <div className="flex flex-col gap-8">
-      <Greeting>
-        <Link href="/add" className={buttonClass()}>
-          <Plus size={16} /> Új könyv
-        </Link>
-      </Greeting>
+      <Greeting />
       <Suspense fallback={<Spinner />}>
         <Dashboard searchParams={searchParams} />
       </Suspense>
@@ -41,7 +37,7 @@ async function Dashboard({ searchParams }) {
           Még üres a <em className="text-accent">polcod</em>
         </h2>
         <p className="mt-2 text-sm text-muted">Add hozzá az első könyvet, amit olvasol vagy el szeretnél olvasni.</p>
-        <Link href="/add" className={buttonClass("primary", "mt-6")}>
+        <Link href="/library/add" className={buttonClass("primary", "mt-6")}>
           <Plus size={16} /> Könyv hozzáadása
         </Link>
       </div>

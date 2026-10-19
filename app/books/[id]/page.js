@@ -11,6 +11,7 @@ import ProgressBar, { progressPercent } from "@/components/ProgressBar";
 import StarRating from "@/components/StarRating";
 import SubmitButton from "@/components/SubmitButton";
 import DeleteBookButton from "@/components/DeleteBookButton";
+import SeriesField from "@/components/SeriesField";
 import { ChipButton, Section, Spinner } from "@/components/ui";
 
 export async function generateMetadata({ params }) {
@@ -70,6 +71,9 @@ async function BookDetail({ params }) {
               {book.seriesName}
               {book.seriesIndex != null && <span className="text-faint">· {book.seriesIndex}. kötet</span>}
             </Link>
+          )}
+          {book.description && (
+            <p className="mt-5 max-w-prose leading-relaxed whitespace-pre-line text-fg/90">{book.description}</p>
           )}
         </header>
 
@@ -150,18 +154,7 @@ async function BookDetail({ params }) {
               </select>
             </Field>
             <Field label="Sorozat">
-              <input
-                name="seriesName"
-                list="series-names"
-                defaultValue={book.seriesName ?? ""}
-                placeholder="pl. Harry Potter"
-                className="field w-full"
-              />
-              <datalist id="series-names">
-                {seriesNames.map((name) => (
-                  <option key={name} value={name} />
-                ))}
-              </datalist>
+              <SeriesField seriesNames={seriesNames} current={book.seriesName} />
             </Field>
             <Field label="Hányadik kötet">
               <input
@@ -181,6 +174,15 @@ async function BookDetail({ params }) {
               <input type="date" name="finishedAt" defaultValue={book.finishedAt ?? ""} className="field w-full" />
             </Field>
           </div>
+          <Field label="Leírás">
+            <textarea
+              name="description"
+              defaultValue={book.description}
+              rows={4}
+              placeholder="Miről szól a könyv?"
+              className="field w-full leading-relaxed"
+            />
+          </Field>
           <Field label="Jegyzetek">
             <textarea
               name="notes"

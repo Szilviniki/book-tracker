@@ -14,7 +14,7 @@ export default function LibraryPage({ searchParams }) {
   return (
     <div className="flex flex-col gap-8">
       <PageHeader eyebrow="Könyveim" title="A" accent="könyvtáram">
-        <Link href="/add" className={buttonClass()}>
+        <Link href="/library/add" className={buttonClass()}>
           <Plus size={16} /> Új könyv
         </Link>
       </PageHeader>

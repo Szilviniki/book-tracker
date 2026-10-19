@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LayoutDashboard, Library, Plus, BookOpen, Heart, Dices } from "lucide-react";
+import { LayoutDashboard, Library, BookOpen, Heart, Dices } from "lucide-react";
 import NavLink from "./NavLink";
 
 // Később ide jön: Naptár, Napló, digitális könyvtár
@@ -8,7 +8,6 @@ const links = [
   { href: "/library", label: "Könyvtár", icon: Library },
   { href: "/favorites", label: "Kedvencek", icon: Heart },
   { href: "/next", label: "Mi legyen a következő?", short: "Következő", icon: Dices },
-  { href: "/add", label: "Új könyv", icon: Plus },
 ];
 
 export default function Sidebar() {

@@ -8,13 +8,15 @@ import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { createBook, updateBook, deleteBook, ValidationError } from "@/lib/server/books";
 import { fillSpineColorsLater } from "@/lib/server/spineColors";
+import { fetchDescription } from "@/lib/openLibrary";
+import { NEW_SERIES } from "@/lib/constants";
 
 // FormData -> könyvmezők. Csak azokat a mezőket vesszük át, amik az űrlapon szerepeltek.
 function readFields(formData) {
   const data = {};
   const text = (name) => (formData.has(name) ? String(formData.get(name)).trim() : undefined);
 
-  for (const name of ["title", "status", "format", "genre", "coverUrl", "startedAt", "finishedAt", "notes", "seriesName"]) {
+  for (const name of ["title", "status", "format", "genre", "coverUrl", "startedAt", "finishedAt", "notes", "description"]) {
     const value = text(name);
     if (value !== undefined) data[name] = value;
   }
@@ -29,6 +31,13 @@ function readFields(formData) {
       .filter(Boolean);
   }
   if (formData.has("source")) data.source = JSON.parse(formData.get("source"));
+
+  // Sorozat: a legördülő listából választott név, vagy "+ Új sorozat…" esetén a beírt új név
+  if (formData.has("seriesChoice")) {
+    const choice = text("seriesChoice");
+    data.seriesName = choice === NEW_SERIES ? text("newSeriesName") : choice;
+    if (!data.seriesName) data.seriesIndex = null; // sorozat nélkül nincs kötetszám
+  }
   return data;
 }
 
@@ -47,9 +56,12 @@ export async function createBookAction(_prevState, formData) {
   redirect(`/books/${book.id}`);
 }
 
-// Új könyv az Open Library találatokból (rejtett mezőkkel érkezik)
+// Új könyv az Open Library találatokból (rejtett mezőkkel érkezik).
+// A leírást is lekérjük az Open Librarytől, hogy a könyv oldalán ott legyen.
 export async function addFoundBook(formData) {
-  const book = createBook(readFields(formData));
+  const data = readFields(formData);
+  if (data.source?.type === "openlibrary") data.description = await fetchDescription(data.source.key);
+  const book = createBook(data);
   fillSpineColorsLater();
   redirect(`/books/${book.id}`);
 }

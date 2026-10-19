@@ -82,7 +82,7 @@ async function NextRead({ searchParams }) {
               ? "Tegyél könyveket az „Olvasni szeretném” listára, és itt sorsolhatsz közülük."
               : "Ebben a műfajban nincs olvasásra váró könyv. Próbálj másikat."}
           </p>
-          <Link href="/add" className={buttonClass("secondary", "mt-6")}>
+          <Link href="/library/add" className={buttonClass("secondary", "mt-6")}>
             Könyv hozzáadása
           </Link>
         </div>

@@ -6,15 +6,15 @@
 import { useActionState } from "react";
 import { createBookAction } from "@/app/actions";
 import { GENRES } from "@/lib/constants";
+import SeriesField from "./SeriesField";
 import SubmitButton from "./SubmitButton";
 
-export default function ManualAddForm({ status, format, seriesNames = [] }) {
+export default function ManualAddForm({ format, seriesNames = [] }) {
   const [state, formAction] = useActionState(createBookAction, null);
   const values = state?.values ?? {};
 
   return (
     <form action={formAction} className="mt-5 grid gap-4 sm:grid-cols-2">
-      <input type="hidden" name="status" value={status} />
       <input type="hidden" name="format" value={format} />
       <Field label="Cím *" name="title" required defaultValue={values.title} className="sm:col-span-2" />
       <Field label="Szerző(k), vesszővel elválasztva" name="authors" defaultValue={values.authors} />
@@ -31,15 +31,17 @@ export default function ManualAddForm({ status, format, seriesNames = [] }) {
         </select>
       </label>
       <Field label="Borítókép URL (opcionális)" name="coverUrl" type="url" defaultValue={values.coverUrl} />
-      <Field label="Sorozat (opcionális)" name="seriesName" list="series-names" defaultValue={values.seriesName} />
-      <datalist id="series-names">
-        {seriesNames.map((name) => (
-          <option key={name} value={name} />
-        ))}
-      </datalist>
+      <div className="flex flex-col gap-1.5 text-sm">
+        <span className="text-muted">Sorozat (opcionális)</span>
+        <SeriesField seriesNames={seriesNames} current={values.seriesChoice} selectClassName="field" />
+      </div>
       <Field label="Hányadik kötet" name="seriesIndex" type="number" min="0" step="0.5" defaultValue={values.seriesIndex} />
+      <label className="flex flex-col gap-1.5 text-sm sm:col-span-2">
+        <span className="text-muted">Leírás (opcionális)</span>
+        <textarea name="description" rows={4} defaultValue={values.description} className="field text-base leading-relaxed" />
+      </label>
       {state?.error && <p className="text-sm text-danger sm:col-span-2">{state.error}</p>}
-      <SubmitButton className="sm:col-span-2 sm:justify-self-start">Mentés</SubmitButton>
+      <SubmitButton className="sm:col-span-2 sm:justify-self-start">Hozzáadás a könyvtárhoz</SubmitButton>
     </form>
   );
 }

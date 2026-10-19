@@ -29,7 +29,7 @@ Az app a Next.js App Router ajánlott működését követi:
 
 | Hely | Tartalom |
 | --- | --- |
-| `app/` | Oldalak (`page.js`), `actions.js` (Server Actions), `error.js`, `not-found.js` |
+| `app/` | Oldalak (`page.js`; az új könyv felvétele: `app/library/add`), `actions.js` (Server Actions), `error.js`, `not-found.js` |
 | `components/` | Felületi elemek; a `"use client"` jelölésűek futnak a böngészőben |
 | `lib/server/` | Adatbázis és lekérdezések (csak szerveren) – sémaváltozás: `MIGRATIONS` a `db.js`-ben |
 | `lib/openLibrary.js` | Könyvkeresés az Open Library API-val (szerveren, 1 órás gyorsítótárral) |
