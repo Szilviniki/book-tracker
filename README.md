@@ -35,11 +35,3 @@ Az app a Next.js App Router ajánlott működését követi:
 | `lib/openLibrary.js` | Könyvkeresés az Open Library API-val (szerveren, 1 órás gyorsítótárral) |
 | `lib/constants.js` | Státuszok, formátumok, műfajok |
 
-## Tervek
-
-- [x] Teljes design átalakítás
-- [x] Kedvencek oldal és „Mi legyen a következő?” véletlen választó
-- [ ] Naptárnézet és olvasási napló
-- [ ] Dashboard átalakítás
-- [ ] AI-os könyvértékelő oldal
-- [ ] Docker
